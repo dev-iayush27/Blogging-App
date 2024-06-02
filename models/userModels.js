@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const crypto = require("crypto");
+const { createTokenForUser } = require("../services/authentication");
 
 const userSchema = new mongoose.Schema(
   {
@@ -21,7 +22,7 @@ const userSchema = new mongoose.Schema(
     },
     profileImageURL: {
       type: String,
-      default: "./images/default_pic.png",
+      default: "/images/default_pic.png",
     },
     role: {
       type: String,
@@ -49,23 +50,27 @@ userSchema.pre("save", function (next) {
   next();
 });
 
-userSchema.static("matchPassword", async function (email, password) {
-  const user = await this.findOne({ email });
-  if (!user) throw new Error("User not found!");
+userSchema.static(
+  "matchPasswordAndGenerateToken",
+  async function (email, password) {
+    const user = await this.findOne({ email });
+    if (!user) throw new Error("User not found!");
 
-  const salt = user.salt;
-  const hashedPassword = user.password;
+    const salt = user.salt;
+    const hashedPassword = user.password;
 
-  const userProvidedHashedPassword = crypto
-    .createHmac("sha256", salt)
-    .update(password)
-    .digest("hex");
+    const userProvidedHashedPassword = crypto
+      .createHmac("sha256", salt)
+      .update(password)
+      .digest("hex");
 
-  if (hashedPassword !== userProvidedHashedPassword)
-    throw new Error("Incorrect password!");
+    if (hashedPassword !== userProvidedHashedPassword)
+      throw new Error("Incorrect password!");
 
-  return { ...user._doc, password: undefined, salt: undefined };
-});
+    const token = createTokenForUser(user);
+    return token;
+  }
+);
 
 const User = mongoose.model("user", userSchema);
 
