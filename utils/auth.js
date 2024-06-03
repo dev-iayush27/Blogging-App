@@ -1,7 +1,5 @@
 const jwt = require("jsonwebtoken");
 
-const secret = "$ayu123$sh456";
-
 function createTokenForUser(user) {
   const payload = {
     _id: user._id,
@@ -10,7 +8,7 @@ function createTokenForUser(user) {
     profileImageURL: user.profileImageURL,
     role: user.role,
   };
-  const token = jwt.sign(payload, secret);
+  const token = jwt.sign(payload, process.env.JWT_SECRET);
   return token;
 }
 
