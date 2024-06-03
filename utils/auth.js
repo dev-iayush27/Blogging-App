@@ -15,7 +15,7 @@ function createTokenForUser(user) {
 function validateToken(token) {
   if (!token) return null;
   try {
-    const payload = jwt.verify(token, secret);
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
     return payload;
   } catch (error) {
     return null;
