@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 // DB connection
 async function connectToMongoDb() {
   return mongoose
-    .connect("mongodb://localhost:27017/blogger")
+    .connect(process.env.MONGODB_URL)
     .then((con) =>
       console.log(
         `MongoDB Database connected with HOST: ${con.connection.host}`

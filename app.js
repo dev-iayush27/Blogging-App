@@ -6,9 +6,13 @@ const cookieParser = require("cookie-parser");
 const { checkForAuthenticationCookie } = require("./middlewares/auth");
 const blogRouter = require("./routes/blogRouter");
 const Blog = require("./models/blogModel");
+const dotenv = require("dotenv");
+
+// Setting up config file
+dotenv.config({ path: "config.env" });
 
 const app = express();
-const PORT = 9000;
+const PORT = process.env.PORT;
 
 connectToMongoDb();
 
